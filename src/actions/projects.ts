@@ -12,7 +12,7 @@ export const getAllProjects = async () => {
 
     const projects = await prisma.project.findMany({
       where: {
-        userId: checkUser?.id,
+        userId: checkUser?.data?.id,
         isDeleted: false,
       },
       orderBy: {
@@ -25,27 +25,34 @@ export const getAllProjects = async () => {
     }
     return { staus: 200, data: projects };
   } catch (err) {
-    console.log('ERROR: ',err)
-    return {status: 500, error: "Internal Server Error"}
+    console.log("ERROR: ", err);
+    return { status: 500, error: "Internal Server Error" };
   }
 };
 
 export const getRecentProjects = async () => {
   try {
     const checkUser = await getUser();
-    if(!checkUser)  {
-      return {status: 403, error: "User Not Authenticated "};
+    if (!checkUser) {
+      return { status: 403, error: "User Not Authenticated " };
     }
 
     const projects = await prisma.project.findMany({
-      where:{
-        userId: checkUser?.id,
+      where: {
+        userId: checkUser?.data?.id,
         isDeleted: false,
-      }, orderBy: {
-        updatedAt:"desc"
-      }
-    })
-  } catch(err)  {
-    
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+      take: 5,
+    });
+    if (projects.length === 0) {
+      return { status: 404, error: "No Recent Projects" };
+    }
+    return { status: 200, data: projects };
+  } catch (err) {
+    console.log("ERROR: ", err);
+    return { status: 500, error: "Internal Server Error" };
   }
-}
+};

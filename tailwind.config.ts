@@ -17,11 +17,22 @@ export default {
         input: `0px 2px 3px -1px rgba(0,0,0,0.1), 0px 1px 0px 0px rgba(25,28,33,0.02), 0px 0px 0px 1px rgba(25,28,33,0.08)`,
       },
       colors: {
-        background: "hsl(var(--background))",
+        background: {
+          DEFAULT: "hsl(var(--background))",
+          primary: "hsl(var(--background-primary))",
+          90: "hsl(var(--background-90))",
+          80: "hsl(var(--background-80))",
+          70: "hsl(var(--background-70))",
+          25: "hsla(var(--background-25))",
+          20: "hsl(var(--background-20))",
+        },
         foreground: "hsl(var(--foreground))",
+        "creative-ai-gradient":
+          "var(--Project-Color-Styles-CreativeAI-Gradient, #F55C7A)",
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+          "primary-80": "hsl(var(--primary-80))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -30,10 +41,15 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          10: "hsl(var(--primary-10))",
+          20: "hsl(var(--primary-20))",
+          80: "hsl(var(--primary-80))",
+          90: "hsl(var(--primary-90))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
+          90: "hsl(var(--secondary-90))",
         },
         muted: {
           DEFAULT: "hsl(var(--muted))",
@@ -68,6 +84,9 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
       },
+      backgroundImage: {
+        "presentify-gradient": "var( --creative-ai-gradient)",
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
@@ -97,16 +116,16 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate"),addVariablesForColors],
+  plugins: [require("tailwindcss-animate"), addVariablesForColors],
 } satisfies Config;
 
 function addVariablesForColors({ addBase, theme }: any) {
-	let allColors = flattenColorPalette(theme("colors"));
-	let newVars = Object.fromEntries(
-	  Object.entries(allColors).map(([key, val]) => [`--${key}`, val])
-	);
-   
-	addBase({
-	  ":root": newVars,
-	});
-  }
+  let allColors = flattenColorPalette(theme("colors"));
+  let newVars = Object.fromEntries(
+    Object.entries(allColors).map(([key, val]) => [`--${key}`, val])
+  );
+
+  addBase({
+    ":root": newVars,
+  });
+}

@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import {
   SidebarGroup,
@@ -5,8 +6,13 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "../ui/sidebar";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { JsonValue } from "@prisma/client/runtime/library";
+import { useToast } from "@/hooks/use-toast";
+import { useSlideStore } from "@/store/useSlideStore";
 
 type Props = {
   items: {
@@ -16,6 +22,18 @@ type Props = {
 };
 
 const RecentOpen = ({ items }: Props) => {
+  const router = useRouter();
+  const sidebar = useSidebar();
+  const { toast } = useToast();
+  const {setSlides} = useSlideStore(); 
+  const handleClick = (projectId: string, slides: JsonValue) => {
+    if (!projectId || slides) {
+      toast({ title: "Project Not Found", description: "Please try again" });
+      return;
+    }
+    setSlides(JSON.parse(JSON.stringify(slides)));
+    router.push(`/presentation/${projectId}`);
+  };
   return (
     <div>
       {items && (
@@ -39,7 +57,7 @@ const RecentOpen = ({ items }: Props) => {
                 </SidebarMenuItem>
               );
             })}
-            {!items && (
+            {items.length === 0 && sidebar.open && (
               <div className="bg-sidebar-accent text-left rounded-xl mt-4  p-4">
                 Your Recent Projects Appear Here
               </div>

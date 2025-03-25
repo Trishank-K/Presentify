@@ -1,4 +1,4 @@
-import { SignUpForm } from "@/components/signup";
+import { SignUpForm } from "@/components/Signup/signup";
 import { BackgroundBeams } from "@/components/ui/background-beams";
 import { Cover } from "@/components/ui/cover";
 
@@ -11,7 +11,7 @@ export default function SignUp() {
         </h1>
       </div>
       <div className="flex lg:items-center justify-center">
-        <div className=" rounded-lg shadow-lg">
+        <div className=" rounded-lg p-16 shadow-2xl">
           <SignUpForm />
         </div>
       </div>

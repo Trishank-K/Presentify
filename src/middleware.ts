@@ -4,7 +4,6 @@ import { auth } from "@/auth";
 
 export async function middleware(request: NextRequest) {
   const session = await auth();
-  console.log("MIDDLEWARE IS DEFINITELY RUNNING", session);
 
   if (!session) {
     return NextResponse.redirect(new URL("/SignUp", request.url));

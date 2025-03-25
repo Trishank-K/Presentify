@@ -14,6 +14,7 @@ import { AvatarImage } from "@radix-ui/react-avatar";
 import NavMain from "./NavMain";
 import { data, Recent } from "@/lib/constants";
 import RecentOpen from "./RecentOpen";
+import NavFooter from "./NavFooter";
 
 const AppSidebar = ({
   recentProjects,
@@ -25,10 +26,10 @@ const AppSidebar = ({
   return (
     <Sidebar
       collapsible="icon"
-      className="max-w-[240px] bg-secondary/20 shadow-secondary"
+      className="max-w-[240px] bg-secondary/20"
       {...props}
     >
-      <SidebarHeader className="pt-6 px-3 pb-0">
+      <SidebarHeader className="pt-6">
         <SidebarMenuButton
           size={"lg"}
           className="data-[state=open]:text-sidebar-accent-background"
@@ -42,12 +43,14 @@ const AppSidebar = ({
           <span className="truncate text-primary text-3xl font-semibold">Presentify</span>
         </SidebarMenuButton>
       </SidebarHeader>
-      <SidebarContent className="mt-6 px-3 gap-y-6">
+      <SidebarContent className="mt-6 px-2 gap-y-6">
         <NavMain items={data.navMain}/>
         <hr />
-        <RecentOpen items={Recent}/>
+        <RecentOpen items={recentProjects}/>
       </SidebarContent>
-      <SidebarFooter />
+      <SidebarFooter>
+        <NavFooter User={user}/>
+      </SidebarFooter>
     </Sidebar>
   );
 };

@@ -36,7 +36,7 @@ const NavMain = ({ items }: Props) => {
   const pathName = usePathname();
   return (
     <SidebarGroup className="p-0">
-      <SidebarMenu>
+      <SidebarMenu className="gap-y-4">
         {items.map((item, idx) => {
           return (
             <SidebarMenuItem key={item.title}>

@@ -117,7 +117,7 @@ export function SignUpForm() {
             variant={"outline"}
             type="button"
             onClick={() => {
-              signIn("google",{redirectTo:"/"});
+              signIn("google",{redirectTo:"/dashboard"});
             }}
           >
             <LogoGoogle />

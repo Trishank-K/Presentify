@@ -1,6 +1,8 @@
+import { getRecentProjects } from "@/actions/projects";
 import getUser from "@/actions/user";
 import AppSidebar from "@/components/AppSideBar/AppSideBar";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import UpperInfoBar from "@/components/UpperInfoBar";
 import { Project, User } from "@prisma/client";
 import { redirect } from "next/navigation";
 import React from "react";
@@ -8,14 +10,17 @@ import React from "react";
 type props = { children: React.ReactNode };
 
 const Layout = async ({children}: props) => {
-    // const recentProjects = await getRecentProjects();
-    const recentProjects: Project[] = []
+    const recentProjects = await getRecentProjects();
     let user = await getUser();
-    if(!user)
+    if(!user.data)
         redirect("/SignUp");
 
   return <SidebarProvider>
-    <AppSidebar recentProjects={recentProjects}></AppSidebar>
+    <AppSidebar user={user.data} recentProjects={recentProjects.data||[]}/>
+    <SidebarInset className="flex">
+      <UpperInfoBar User={user.data}/>
+        {children}
+    </SidebarInset>
   </SidebarProvider>
 };
 
