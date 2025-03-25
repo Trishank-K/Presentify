@@ -56,3 +56,77 @@ export const getRecentProjects = async () => {
     return { status: 500, error: "Internal Server Error" };
   }
 };
+
+export const recoverProject = async (projectId: string) => {
+  try {
+    const user = await getUser();
+    if (!user) {
+      return { status: 403, error: "User Not Authenticated" };
+    }
+    const project = await prisma.project.findFirst({
+      where: {
+        id: projectId,
+      },
+      select: {
+        userId: true,
+      },
+    });
+    if(!project){
+      return {status:500, error: "Failed to recover project"}
+    }
+
+    if (project?.userId === user.data?.id) {
+      const recover = await prisma.project.update({
+        where: {
+          id: projectId,
+        },
+        data: {
+          isDeleted: false,
+        },
+      });
+      return { status: 200, data: "Recover Successful" };
+    }
+
+    return { status: 403, error: "User Not Authorised" };
+  } catch (err) {
+    console.log(err);
+    return {status:500, error: "Some Error Occured"}
+  }
+};
+
+export const deleteProject = async (projectId: string) => {
+  try {
+    const user = await getUser();
+    if (!user) {
+      return { status: 403, error: "User Not Authenticated" };
+    }
+    const project = await prisma.project.findFirst({
+      where: {
+        id: projectId,
+      },
+      select: {
+        userId: true,
+      },
+    });
+    if(!project){
+      return {status:500, error: "Failed to recover project"}
+    }
+
+    if (project?.userId === user.data?.id) {
+      const recover = await prisma.project.update({
+        where: {
+          id: projectId,
+        },
+        data: {
+          isDeleted: true,
+        },
+      });
+      return { status: 200, data: "Delete Successful" };
+    }
+
+    return { status: 403, error: "User Not Authorised" };
+  } catch (err) {
+    console.log(err);
+    return {status:500, error: "Some Error Occured"}
+  }
+};

@@ -11,7 +11,6 @@ import NewProjectButton from "./NewProjectButton";
 
 type Props = {
   User: User;
-  children?: React.ReactNode;
 };
 
 const UpperInfoBar = ({ User }: Props) => {
