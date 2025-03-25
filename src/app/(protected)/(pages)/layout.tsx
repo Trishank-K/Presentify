@@ -19,7 +19,9 @@ const Layout = async ({children}: props) => {
     <AppSidebar user={user.data} recentProjects={recentProjects.data||[]}/>
     <SidebarInset className="flex">
       <UpperInfoBar User={user.data}/>
+      <div className="p-4">
         {children}
+      </div>
     </SidebarInset>
   </SidebarProvider>
 };
