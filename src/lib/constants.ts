@@ -30,6 +30,28 @@ export const data = {
       icon: Settings,
     },
   ],
+  navMain2: [
+    {
+      label: "Home",
+      href: "/dashboard",
+      icon: Home,
+    },
+    {
+      label: "Templates",
+      href: "/templates",
+      icon: SquareStack,
+    },
+    {
+      label: "Trash",
+      href: "/trash",
+      icon: Trash2,
+    },
+    {
+      label: "Settings",
+      href: "/settings",
+      icon: Settings,
+    },
+  ],
 };
 
 export const Recent = [

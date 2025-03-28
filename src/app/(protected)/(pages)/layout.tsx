@@ -1,6 +1,8 @@
 import { getRecentProjects } from "@/actions/projects";
 import getUser from "@/actions/user";
 import AppSidebar from "@/components/AppSideBar/AppSideBar";
+import { SideBar } from "@/components/AppSideBar/AppSideBar2";
+
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import UpperInfoBar from "@/components/UpperInfoBar";
 import { Project, User } from "@prisma/client";
@@ -16,7 +18,7 @@ const Layout = async ({children}: props) => {
         redirect("/SignUp");
 
   return <SidebarProvider>
-    <AppSidebar user={user.data} recentProjects={recentProjects.data||[]}/>
+    <SideBar user={user.data} recentProjects={recentProjects.data||[]}/>
     <SidebarInset className="flex">
       <UpperInfoBar User={user.data}/>
       <div className="p-4">

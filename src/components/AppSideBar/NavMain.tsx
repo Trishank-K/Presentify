@@ -1,6 +1,7 @@
 "use client";
 import React, {
   ForwardRefExoticComponent,
+  ReactNode,
   RefAttributes,
   SVGProps,
 } from "react";
@@ -23,7 +24,7 @@ type Props = {
       | SVGProps<SVGAElement>
       | ForwardRefExoticComponent<
           Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>
-        >;
+        > | ReactNode | Element;
     isActive?: boolean;
     items?: {
       title: string;
@@ -36,14 +37,14 @@ const NavMain = ({ items }: Props) => {
   const pathName = usePathname();
   return (
     <SidebarGroup className="p-0">
-      <SidebarMenu className="gap-y-4">
+      <SidebarMenu className="gap-y-4 p-0">
         {items.map((item, idx) => {
           return (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
                 asChild
                 tooltip={item.title}
-                className={`py-6 ${
+                className={` py-6 ${
                   pathName.includes(item.url) && "bg-sidebar-accent"
                 }`}
               >
