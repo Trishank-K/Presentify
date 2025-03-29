@@ -22,7 +22,7 @@ export const useCreativeAiStore = create<CreativeAiStore>()(
       },
       addMultipleOutlines(outlines) {
         set(() => ({
-          outlines: [...outlines],
+          outlines: outlines,
         }));
       },
       currentAiPrompt: "",

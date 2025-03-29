@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { containerVariants, itemVariants } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import CardList from "../../Common/CardList";
+import CardList from "../Common/CardList";
+import usePromptStore from "@/store/usePromptStore";
+import RecentPrompts from "./RecentPrompts";
+import { useToast } from "@/hooks/use-toast";
+import { generateCreativePrompt } from "@/actions/ai";
+import { OutlineCard } from "@/lib/types";
+import { v4 as uuidv4 } from "uuid";
+import { createProject } from "@/actions/projects";
+import { useSlideStore } from "@/store/useSlideStore";
 
 type Props = {
   onBack: () => void;
@@ -30,13 +38,75 @@ const CreativeAI = ({ onBack }: Props) => {
     addMultipleOutlines,
     resetOutlines,
   } = useCreativeAiStore();
+  const { setProject } = useSlideStore();
   const [noOfCards, setNoOfCards] = useState(0);
   const [editingCard, setEditingCard] = useState<string | null>(null);
   const [editText, setEditText] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
+  const { prompts, addPrompt } = usePromptStore();
+  const { toast } = useToast();
 
-  const generateOutline = () => {};
+  const handleGenerate = async () => {
+    if (outlines.length === 0) {
+      toast({
+        title: "Error",
+        description: "Please add at least once card to generate slides",
+      });
+      return;
+    }
+    setIsGenerating(true);
+    try {
+      const res = await createProject(
+        currentAiPrompt,
+        outlines.slice(0, noOfCards)
+      );
+      if (res.status !== 200 || !res.data) {
+        throw new Error("Failed to generate slides");
+      }
+      router.push(`/presentation/${res.data.id}/select-theme`);
+      setProject(res.data);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Something went wrong while generating slides",
+      });
+    }
+    setIsGenerating(false);
+  };
+  useEffect(() => {
+    setNoOfCards(outlines.length);
+  }, [outlines]);
+
+  const generateOutline = async () => {
+    if (currentAiPrompt === "") {
+      toast({
+        title: "Error",
+        description: "You need to enter a prompt before generating outlines",
+      });
+      return;
+    }
+    setIsGenerating(true);
+    const res = await generateCreativePrompt(currentAiPrompt);
+    if (res.status === 200 && res.data.outlines) {
+      const cardsData: OutlineCard[] = [];
+      res.data.outlines.map((outline: string, idx: number) => {
+        const newCard = {
+          id: uuidv4(),
+          title: outline,
+          order: idx + 1,
+        };
+        cardsData.push(newCard);
+      });
+      addMultipleOutlines(cardsData);
+      setNoOfCards(cardsData.length);
+      toast({
+        title: "Success",
+        description: "Outlines generated successfully",
+      });
+    }
+    setIsGenerating(false);
+  };
 
   const resetCards = () => {
     setEditingCard(null);
@@ -139,15 +209,31 @@ const CreativeAI = ({ onBack }: Props) => {
         selectedCard={selectedCard}
         editText={editText}
         onEditChange={setEditText}
-        onCardSelect={setSelectedCard} 
+        onCardSelect={setSelectedCard}
         setEditText={setEditText}
         setEditingCard={setEditingCard}
         setSelectedCard={setSelectedCard}
-        onCardDoubleClick={(id,title)=>{
+        onCardDoubleClick={(id, title) => {
           setEditingCard(id);
-          setEditText(title); 
+          setEditText(title);
         }}
-      ></CardList>
+      />
+      {outlines.length > 0 && (
+        <Button
+          className="w-full"
+          onClick={handleGenerate}
+          disabled={isGenerating}
+        >
+          {isGenerating ? (
+            <>
+              <Loader2 className="animate-spin mr-2" /> Generating...
+            </>
+          ) : (
+            "Generate"
+          )}
+        </Button>
+      )}
+      {prompts.length > 0 && <RecentPrompts />}
     </motion.div>
   );
 };
