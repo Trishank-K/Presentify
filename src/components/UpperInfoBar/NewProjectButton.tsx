@@ -12,7 +12,6 @@ const NewProjectButton = ({ user }: { user: User }) => {
   return (
     <Button
       className=" rounderd-lg font-semibold"
-      disabled={!user.subscription}
       onClick={()=>router.push('/create-page')}
     >
       <Plus />

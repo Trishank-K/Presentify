@@ -72,8 +72,8 @@ export const recoverProject = async (projectId: string) => {
         userId: true,
       },
     });
-    if(!project){
-      return {status:500, error: "Failed to recover project"}
+    if (!project) {
+      return { status: 500, error: "Failed to recover project" };
     }
 
     if (project?.userId === user.data?.id) {
@@ -91,7 +91,7 @@ export const recoverProject = async (projectId: string) => {
     return { status: 403, error: "User Not Authorised" };
   } catch (err) {
     console.log(err);
-    return {status:500, error: "Some Error Occured"}
+    return { status: 500, error: "Some Error Occured" };
   }
 };
 
@@ -109,8 +109,8 @@ export const deleteProject = async (projectId: string) => {
         userId: true,
       },
     });
-    if(!project){
-      return {status:500, error: "Failed to recover project"}
+    if (!project) {
+      return { status: 500, error: "Failed to recover project" };
     }
 
     if (project?.userId === user.data?.id) {
@@ -128,25 +128,20 @@ export const deleteProject = async (projectId: string) => {
     return { status: 403, error: "User Not Authorised" };
   } catch (err) {
     console.log(err);
-    return {status:500, error: "Some Error Occured"}
+    return { status: 500, error: "Some Error Occured" };
   }
 };
 
-export const createProject = async (
-  title: string,
-  outlines: OutlineCard[]
-) => {    
+export const createProject = async (title: string, outlines: OutlineCard[]) => {
   try {
     const user = await getUser();
     if (!user || !user.data) {
       return { status: 403, error: "User Not Authenticated" };
     }
-    if(!title || !outlines || outlines.length === 0){
+    if (!title || !outlines || outlines.length === 0) {
       return { status: 400, error: "Title and Outlines are required" };
     }
-    const allOutlines = outlines.map((outline) => (
-      outline.title
-    ));
+    const allOutlines = outlines.map((outline) => outline.title);
 
     const project = await prisma.project.create({
       data: {
@@ -156,10 +151,33 @@ export const createProject = async (
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-    })
+    });
     return { status: 200, data: project };
   } catch (err) {
     console.log(err);
     return { status: 500, error: "Internal Server Error" };
   }
-}
+};
+
+export const getProjectById = async (projectId: string) => {
+  try {
+    const user = await getUser();
+    if (!user) {
+      return { status: 403, error: "User Not Authenticated" };
+    }
+    const project = await prisma.project.findFirst({
+      where: {
+        id: projectId,
+        userId: user.data?.id,
+        isDeleted: false,
+      },
+    });
+    if (!project) {
+      return { status: 404, error: "Project Not Found" };
+    }
+    return { status: 200, data: project };
+  } catch (err) {
+    console.log(err);
+    return { status: 500, error: "Internal Server Error" };
+  }
+};

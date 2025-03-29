@@ -66,13 +66,27 @@ const CreativeAI = ({ onBack }: Props) => {
       }
       router.push(`/presentation/${res.data.id}/select-theme`);
       setProject(res.data);
+      addPrompt({
+        id: uuidv4(),
+        title: currentAiPrompt || outlines[0].title,
+        createdAt: new Date().toISOString(),
+        outlines: outlines,
+      });
+      toast({
+        title: "Success",
+        description: "Project created successfully",
+      });
+      setCurrentAiPrompt("");
+      resetOutlines();
     } catch (error) {
       toast({
         title: "Error",
-        description: "Something went wrong while generating slides",
+        description: "Failed to create project",
+        variant: "destructive",
       });
+    } finally {
+      setIsGenerating(false);
     }
-    setIsGenerating(false);
   };
   useEffect(() => {
     setNoOfCards(outlines.length);
