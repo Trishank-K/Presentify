@@ -12,8 +12,9 @@ import NavFooter from "./NavFooter";
 export const SideBar = ({
   recentProjects,
   user,
+  children,
   ...props
-}: { recentProjects: Project[] } & { user: User } & React.ComponentProps<
+}: { recentProjects: Project[] } & { user: User } & {children?:React.ReactNode} & React.ComponentProps<
     typeof Sidebar
   >) => {
   const [open, setOpen] = useState(false);

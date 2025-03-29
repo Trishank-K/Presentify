@@ -18,7 +18,9 @@ const Layout = async ({children}: props) => {
         redirect("/SignUp");
 
   return <SidebarProvider>
-    <SideBar user={user.data} recentProjects={recentProjects.data||[]}/>
+    <SideBar user={user.data} recentProjects={recentProjects.data||[]}>
+      {""}
+    </SideBar>
     <SidebarInset className="flex">
       <UpperInfoBar User={user.data}/>
       <div className="p-4">

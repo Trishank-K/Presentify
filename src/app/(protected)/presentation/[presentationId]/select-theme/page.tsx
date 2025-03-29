@@ -4,7 +4,7 @@ type Props = {}
 
 const Page = (props: Props) => {
   return (
-    <ThemePreview />
+    <div></div>
   )
 }
 
