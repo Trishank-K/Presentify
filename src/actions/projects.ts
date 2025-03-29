@@ -2,6 +2,7 @@
 
 import { prisma } from "@/db/prisma";
 import getUser from "./user";
+import { OutlineCard } from "@/lib/types";
 
 export const getAllProjects = async () => {
   try {
@@ -130,3 +131,35 @@ export const deleteProject = async (projectId: string) => {
     return {status:500, error: "Some Error Occured"}
   }
 };
+
+export const createProject = async (
+  title: string,
+  outlines: OutlineCard[]
+) => {    
+  try {
+    const user = await getUser();
+    if (!user || !user.data) {
+      return { status: 403, error: "User Not Authenticated" };
+    }
+    if(!title || !outlines || outlines.length === 0){
+      return { status: 400, error: "Title and Outlines are required" };
+    }
+    const allOutlines = outlines.map((outline) => (
+      outline.title
+    ));
+
+    const project = await prisma.project.create({
+      data: {
+        title: title,
+        userId: user.data.id,
+        outlines: allOutlines,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    })
+    return { status: 200, data: project };
+  } catch (err) {
+    console.log(err);
+    return { status: 500, error: "Internal Server Error" };
+  }
+}

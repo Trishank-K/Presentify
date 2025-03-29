@@ -4,6 +4,7 @@ import React, { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Card from "./Card";
 import AddCardButton from "./AddCardButton";
+import { v4 as uuidv4 } from "uuid";
 
 type Props = {
   outlines: OutlineCard[];
@@ -19,7 +20,7 @@ type Props = {
   setSelectedCard: (id: string | null) => void;
   addMultipleOutlines: (cards: OutlineCard[]) => void;
 };
-
+// WIP: Fix add card and remove card functionality
 const CardList = ({
   outlines,
   editingCard,
@@ -53,7 +54,6 @@ const CardList = ({
     addMultipleOutlines(
       outlines
         .filter((card) => card.id !== id)
-        .map((card, index) => ({ ...card, order: index + 1 }))
     );
   };
 
@@ -115,6 +115,29 @@ const CardList = ({
     if (y < threshold) {
       setDragOverIndex(index);
     } else setDragOverIndex(index + 1);
+  };
+
+  const onAddCard = (index?: number) => {
+    console.log("Index: ", index);
+    const newCard: OutlineCard = {
+      id: uuidv4(),
+      title: editText || "New Section",
+      order: (index !== undefined ? index+1:outlines.length + 1),
+    };
+    console.log("New Card: ", newCard.order);
+
+    const updatedCards = index !== undefined?[
+      ...outlines.slice(0, index),
+      newCard,
+      ...outlines.slice(index+1).map((card) => ({
+        ...card,
+        order: card.order + 1,
+      })),
+    ]: [...outlines, newCard]
+    console.log(updatedCards);
+
+    addMultipleOutlines(updatedCards)
+    setEditText('');
   };
 
   const getDragOverStyles = (cardIndex:number) => {
@@ -184,7 +207,7 @@ const CardList = ({
                   }}
                   dragOverStyles={getDragOverStyles(idx)}
                 />
-              <AddCardButton/>  
+              <AddCardButton onAddCard={()=>onAddCard(idx+1)}/>  
               </React.Fragment>
             );
           })}

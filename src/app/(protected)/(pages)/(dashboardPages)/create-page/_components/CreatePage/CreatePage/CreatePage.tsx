@@ -7,7 +7,7 @@ import {
   itemVariants,
 } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
-import RecentPrompts from "./GenerateAI/RecentPrompts";
+import RecentPrompts from "../GenerateAI/RecentPrompts";
 import usePromptStore from "@/store/usePromptStore";
 
 type Props = {
