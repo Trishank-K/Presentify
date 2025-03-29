@@ -22,11 +22,17 @@ type Props = {
 
 const CreativeAI = ({ onBack }: Props) => {
   const router = useRouter();
-  const { currentAiPrompt, setCurrentAiPrompt, outlines, resetOutlines } =
-    useCreativeAiStore();
+  const {
+    currentAiPrompt,
+    setCurrentAiPrompt,
+    outlines,
+    addOutline,
+    addMultipleOutlines,
+    resetOutlines,
+  } = useCreativeAiStore();
   const [noOfCards, setNoOfCards] = useState(0);
   const [editingCard, setEditingCard] = useState<string | null>(null);
-  const [editText, setEditText] = useState<string | null>(null);
+  const [editText, setEditText] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
 
@@ -121,11 +127,27 @@ const CreativeAI = ({ onBack }: Props) => {
               <Loader2 className="animate-spin mr-2" /> Generating...
             </>
           ) : (
-            'Generate Outline'
+            "Generate Outline"
           )}
         </Button>
       </div>
-      <CardList></CardList>
+      <CardList
+        outlines={outlines}
+        addOutline={addOutline}
+        addMultipleOutlines={addMultipleOutlines}
+        editingCard={editingCard}
+        selectedCard={selectedCard}
+        editText={editText}
+        onEditChange={setEditText}
+        onCardSelect={setSelectedCard} 
+        setEditText={setEditText}
+        setEditingCard={setEditingCard}
+        setSelectedCard={setSelectedCard}
+        onCardDoubleClick={(id,title)=>{
+          setEditingCard(id);
+          setEditText(title); 
+        }}
+      ></CardList>
     </motion.div>
   );
 };
