@@ -4,20 +4,35 @@ import { motion, AnimatePresence } from "framer-motion";
 import React from "react";
 import usePromptStore from "@/store/usePromptStore";
 import CreatePage from "./CreatePage/CreatePage";
+import CreativeAI from "./CreatePage/GenerateAI/CreativeAI";
 
 type Props = {};
 
 const RenderPage = (props: Props) => {
   const router = useRouter();
   const { page, setPage } = usePromptStore();
+  const handleSelectOption = (option: string) => {
+    if (option === "template") {
+      router.push("/templates");
+    } else if (option === "create-scratch") {
+      setPage("create-scratch");
+    } else {
+      setPage("creative-ai");
+    }
+  };
+
+  const handleBack = () => {
+    setPage("create");
+  };
+
   const renderStep = () => {
     switch (page) {
       case "create":
-        return <CreatePage/>;
+        return <CreatePage onSelectOption={handleSelectOption} />;
       case "create-scratch":
         return <>bbb</>;
       case "creative-ai":
-        return <>ccc</>;
+        return <CreativeAI onBack={handleBack}/>;
       default:
         return null;
     }
@@ -31,7 +46,7 @@ const RenderPage = (props: Props) => {
         exit={{ opacity: 0, x: -20 }}
         transition={{ duration: 0.3 }}
       >
-        {renderStep()} 
+        {renderStep()}
       </motion.div>
     </AnimatePresence>
   );
