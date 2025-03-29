@@ -3,6 +3,7 @@ import { OutlineCard } from "@/lib/types";
 import React, { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Card from "./Card";
+import AddCardButton from "./AddCardButton";
 
 type Props = {
   outlines: OutlineCard[];
@@ -92,7 +93,17 @@ const CardList = ({
     draggedEl.style.width = `${(e.currentTarget as HTMLElement).offsetWidth}px`;
     document.body.appendChild(draggedEl);
     e.dataTransfer.setDragImage(draggedEl, 0, dragOffsetY.current);
+
+    setTimeout(()=>{
+      setDragOverIndex(outlines.findIndex((c)=>c.id === card.id))
+      document.body.removeChild(draggedEl)
+    },0)
   };
+
+  const onDragEnd = () => {
+      setDraggedItem(null)
+      setDragOverIndex(null)
+  }
 
   const onDragOver = (e: React.DragEvent, index: number) => {
     e.preventDefault();
@@ -105,6 +116,26 @@ const CardList = ({
       setDragOverIndex(index);
     } else setDragOverIndex(index + 1);
   };
+
+  const getDragOverStyles = (cardIndex:number) => {
+    if(dragOverIndex === null || draggedItem === null) return{}
+    if(cardIndex === dragOverIndex){
+      return {
+        borderTop: '2px solid #000',
+        marginTop: '0.5rem',
+        transition: 'margin 0.2s cubic-berzier(0.25,0.1,0.25,1)'
+      }
+    }
+    else if(cardIndex === dragOverIndex-1){
+      return {
+        borderBottom: '2px solid #000',
+        marginTop: '0.5rem',
+        transition: 'margin 0.2s cubic-berzier(0.25,0.1,0.25,1)'
+      }
+    }
+    return {};
+  }
+
   return (
     <motion.div
       className="space-y-2 -my-2"
@@ -128,7 +159,7 @@ const CardList = ({
             return (
               <React.Fragment key={card.id}>
                 <Card
-                  onDragOver={(e) => onDragOver(e, index)}
+                  onDragOver={(e) => onDragOver(e, idx)}
                   card={card}
                   isEditing={editingCard === card.id}
                   isSelected={selectedCard === card.id}
@@ -151,7 +182,9 @@ const CardList = ({
                     },
                     onDragEnd: onDragEnd,
                   }}
+                  dragOverStyles={getDragOverStyles(idx)}
                 />
+              <AddCardButton/>  
               </React.Fragment>
             );
           })}
