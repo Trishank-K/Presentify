@@ -7,6 +7,8 @@ import { Theme } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import ThemeCard from "./ThemeCard";
+import { themes } from "@/lib/constants";
+import ThemePicker from "./ThemePicker";
 
 type Props = {};
 
@@ -142,6 +144,11 @@ const ThemePreview = (props: Props) => {
     </div>
   );
 
+  const applyTheme = (theme: Theme) => {
+    setSelectedTheme(theme);
+    setCurrentTheme(theme);
+  };
+
   return (
     <div
       className="h-screen w-full flex"
@@ -151,7 +158,7 @@ const ThemePreview = (props: Props) => {
         fontFamily: selectedTheme.fontFamily,
       }}
     >
-      <div className="flex-grow overflow-y-auto">
+      <div className="flex-grow overflow-hidden">
         <div className="flex flex-col p-12 items-center min-h-screen">
           <Button
             variant={"outline"}
@@ -195,6 +202,7 @@ const ThemePreview = (props: Props) => {
           </div>
         </div>
       </div>
+      <ThemePicker selectedTheme={selectedTheme} themes={themes} onThemeSelect={applyTheme}/>
     </div>
   );
 };
