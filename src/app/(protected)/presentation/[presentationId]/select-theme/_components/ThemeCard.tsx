@@ -26,7 +26,7 @@ const ThemeCard = ({
       hidden: { opacity: 0, x: "-50%", y: "-50%", scale: 0.9, rotate: 0 },
       visible: {
         opacity: 1,
-        x: "25%",
+        x: "-25%",
         y: "-25%",
         scale: 0.95,
         rotate: -10,
@@ -42,7 +42,7 @@ const ThemeCard = ({
       hidden: { opacity: 0, x: "50%", y: "-50%", scale: 0.9, rotate: 0 },
       visible: {
         opacity: 1,
-        x: "-25%",
+        x: "25%",
         y: "25%",
         scale: 0.95,
         rotate: 10,
@@ -73,7 +73,7 @@ const ThemeCard = ({
       initial="hidden"
       animate={controls}
       variants={variants[variant]}
-      className="abslute w-full max-w-3xl"
+      className="absolute w-full max-w-3xl"
       style={{ zIndex: variant === "main" ? 10 : 0 }}
     >
       <Card
