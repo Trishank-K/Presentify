@@ -1,4 +1,4 @@
-name: Deploy to Azure Web App
+name: Deploy to Azure VM
 
 on:
   workflow_run:
@@ -9,15 +9,25 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Login to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v2
+      - name: Set up SSH key for Azure VM
+        uses: webfactory/ssh-agent@v0.5.3
         with:
-          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
-          images: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/presentify:latest
+          ssh-private-key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
+
+      - name: SSH into Azure VM and Deploy Docker
+        run: |
+          ssh -o StrictHostKeyChecking=no azureuser@<your-vm-public-ip> << 'EOF'
+            # Pull the latest image from DockerHub
+            docker pull yourdockerhubusername/presentify:latest
+
+            # Stop any running container (optional)
+            docker stop presentify || true
+            docker rm presentify || true
+
+            # Run the new container
+            docker run -d -p 3000:3000 --name presentify yourdockerhubusername/presentify:latest
+          EOF
