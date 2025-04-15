@@ -1,0 +1,10 @@
+FROM oven/bun:latest
+
+WORKDIR /usr/src/presentify
+
+COPY . .
+
+RUN bun install
+RUN bunx prisma generate --no-engine && bun run build
+
+CMD ["bun", "run", "dev"]

@@ -1,9 +1,9 @@
 "use server";
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI, MediaResolution, Type } from "@google/genai";
 import getUser from "./user";
 import { prisma } from "@/db/prisma";
 import { v4 as uuidv4 } from "uuid";
-import { ContentType } from "@/lib/types";
+import { ContentItem, ContentType, Slide } from "@/lib/types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENAI_API_KEY });
 
@@ -671,6 +671,7 @@ export const generateLayoutsJson = async (outlineArray: string[]) => {
     let jsonResponse;
     try {
       jsonResponse = JSON.parse(responseContent.replace(/```json|```/g, ""));
+      const parsedResponse = await replaceImagePlaceholders(jsonResponse);
     } catch (error) {
       console.log("🔴 ERROR:", error);
       throw new Error("Invalid JSON format received from AI");
@@ -733,5 +734,83 @@ export const generateLayouts = async (projectId: string, theme: string) => {
   } catch (error) {
     console.error("🔴 ERROR", error);
     return { status: 500, error: "Internal server error" };
+  }
+};
+
+const generateImageUrl = async (prompt: string): Promise<string> => {
+  try {
+    const improvedPrompt = `
+    Create a highly realistic, professional image based on the following description. The image should look as if captured in real life, with attention to detail, lighting, and texture. 
+
+    Description: ${prompt}
+
+    Important Notes:
+    - The image must be in a photorealistic style and visually compelling.
+    - Ensure all text, signs, or visible writing in the image are in English.
+    - Pay special attention to lighting, shadows, and textures to make the image as lifelike as possible.
+    - Avoid elements that appear abstract, cartoonish, or overly artistic. The image should be suitable for professional presentations.
+    - Focus on accurately depicting the concept described, including specific objects, environment, mood, and context. Maintain relevance to the description provided.
+
+    Example Use Cases: Business presentations, educational slides, professional designs.
+  `;
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash-exp-image-generation",
+      contents: improvedPrompt,
+      config: {
+        responseModalities: ["Image"],
+        mediaResolution: MediaResolution.MEDIA_RESOLUTION_MEDIUM,
+      },
+    });
+    if (
+      !response.candidates ||
+      response.candidates.length === 0 ||
+      !response.candidates[0].content ||
+      !response.candidates[0].content.parts
+    ) {
+      console.error("No valid image response received");
+      return "https://fakeimg.pl/1024x1024/000000/ffffff?text=Image";
+    }
+    for (const part of response.candidates[0].content.parts) {
+      if (part.text) {
+        console.log(part.text);
+      } else if (part.inlineData) {
+        const imageData = part.inlineData.data;
+        if (!imageData) {
+          console.error("No image data found");
+          return "https://fakeimg.pl/1024x1024/000000/ffffff?text=Image";
+        }
+        return imageData;
+      }
+    }
+    return "https://fakeimg.pl/1024x1024/000000/ffffff?text=Image";
+  } catch (error) {
+    console.error("Failed to generate image:", error);
+    return "https://fakeimg.pl/1024x1024/000000/ffffff?text=Image";
+  }
+};
+
+const findImageComponents = (layout: ContentItem): ContentItem[] => {
+  const images = [];
+  if (layout.type === "image") {
+    images.push(layout);
+  }
+  if (Array.isArray(layout.content)) {
+    layout.content.forEach((child) => {
+      images.push(...findImageComponents(child as ContentItem));
+    });
+  } else if (layout.content && typeof layout.content === "object") {
+    images.push(...findImageComponents(layout.content));
+  }
+  return images;
+};
+
+const replaceImagePlaceholders = async (layout: Slide) => {
+  const imageComponents = findImageComponents(layout.content);
+  console.log("🟢 Found image components:", imageComponents);
+  for (const component of imageComponents) {
+    console.log("🟢 Generating image for component:", component.alt);
+    component.content = await generateImageUrl(
+      component.alt || "Placeholder Image"
+    );
   }
 };

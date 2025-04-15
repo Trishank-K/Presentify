@@ -8,6 +8,7 @@ import { useTheme } from "next-themes";
 import { redirect, useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
+import {HTML5Backend} from 'react-dnd-html5-backend'
 
 type Props = {};
 
@@ -60,7 +61,11 @@ const page = (props: Props) => {
         );
     }
 
-//   return <DndProvider></DndProvider>
+  return <DndProvider backend={HTML5Backend}>
+    <div>
+      
+    </div>
+  </DndProvider>
 };
 
 export default page;
